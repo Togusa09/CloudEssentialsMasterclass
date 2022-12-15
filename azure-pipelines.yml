@@ -22,3 +22,16 @@ steps:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
+
+# - task: AzureResourceManagerTemplateDeployment@3
+#   inputs:
+#     deploymentScope: 'Resource Group'
+#     azureResourceManagerConnection: 'Visual Studio Professional(1)(a2f5932a-dc69-4389-a87a-8107f0983604)'
+#     subscriptionId: 'a2f5932a-dc69-4389-a87a-8107f0983604'
+#     action: 'Create Or Update Resource Group'
+#     resourceGroupName: '$(ResourceGroup)'
+#     location: 'East US'
+#     templateLocation: 'Linked artifact'
+#     csmFile: './scripts/environment.bicep'
+#     deploymentMode: 'Incremental'
+#     deploymentOutputs: 'outputStorageVar'
