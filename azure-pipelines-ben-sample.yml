@@ -1,0 +1,143 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: ev-tracker
+  - name: solution
+    value: '**/*.sln'
+  - name: buildPlatform
+    value: 'Any CPU'
+  - name: buildConfiguration
+    value: 'Release'
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Use .NET Core sdk'
+  inputs:
+    packageType: 'sdk'
+    version: '6.0.x'
+    includePreviewVersions: true
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    arguments: '--configuration $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)/Output'
+    publishWebProjects: true
+
+# - task: VSTest@2
+#   inputs:
+#     platform: '$(buildPlatform)'
+#     configuration: '$(buildConfiguration)'
+
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'Visual Studio Professional(1)(a2f5932a-dc69-4389-a87a-8107f0983604)'
+    subscriptionId: 'a2f5932a-dc69-4389-a87a-8107f0983604'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'Electric-Vehicle-Tracker'
+    location: 'East US'
+    templateLocation: 'Linked artifact'
+    csmFile: './scripts/environment.bicep'
+    overrideParameters: '-sqlAdministratorLogin $(sqlAdministratorLogin) -sqlAdministratorLoginPassword $(sqlAdministratorLoginPassword)'
+    deploymentMode: 'Incremental'
+    deploymentOutputs: 'outputStorageVar'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      $obj = ConvertFrom-Json '$(outputStorageVar)'
+      echo $obj.webSiteName.value
+      $env:Test = "testVal"
+      echo $env:test
+      #$env:ConnectionStrings:EvTrackingDb = "Server=(localdb)\\MSSQLLocalDB;Database=EvTracking;Trusted_Connection=True;MultipleActiveResultSets=true"
+      $env:ConnectionStrings:EvTrackingDb = "Data Source=tcp:$($obj.sqlServerName.value),1433;Initial Catalog=EvTracking;User Id=$(sqlAdministratorLogin)@$($obj.sqlServerName.value);Password=$(sqlAdministratorLoginPassword)";
+      echo $env:ConnectionStrings:BailReportingDb 
+      Write-Host "##vso[task.setvariable variable=webSiteName]$($obj.webSiteName.value)"
+      Write-Host "##vso[task.setvariable variable=sqlServerName]$($obj.sqlServerName.value)"
+      Write-Host "##vso[task.setvariable variable=SQLCONNSTR_EvTracking]$($obj.sqlServerName.value)"
+      
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'Visual Studio Professional(1)(a2f5932a-dc69-4389-a87a-8107f0983604)'
+    appType: 'webAppLinux'
+    appName: '$(webSitename)'
+    package: '$(Build.ArtifactStagingDirectory)/Output/**/*.zip'
+
+# - task: DotNetCoreCLI@2
+#   inputs:
+#     command: 'build'
+#     projects: './src/ElectricVehicleTracker.DbUp'
+
+# - task: PowerShell@2
+#   inputs:
+#     targetType: 'inline'
+#     script: |
+#       ./src/ElectricVehicleTracker.DbUp/bin/Release/net6.0/ElectricVehicleTracker.DbUp.exe
+- task: DotNetCoreCLI@2
+  displayName: 'Build DbUp'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: |
+      **/ElectricVehicleTracker.DbUp/**/*.csproj
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: false
+    workingDirectory: 'src'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      echo $env:ConnectionStrings:EvTrackingDb
+      dotnet ElectricVehicleTracker.DbUp/ElectricVehicleTracker.DbUp.dll
+    workingDirectory: '$(Build.ArtifactStagingDirectory)'
+
+# - task: AzureWebApp@1
+#   inputs:
+#     azureSubscription: 'Visual Studio Professional(a2f5932a-dc69-4389-a87a-8107f0983604)'
+#     appType: 'webAppLinux'
+#     appName: '$(webSiteName)'
+#     package: '$(System.DefaultWorkingDirectory)/**/*.zip'
+#     runtimeStack: 'DOTNETCORE|6.0'
+
+
+
+#- task: AzureRmWebAppDeployment@4
+#  inputs:
+#    ConnectionType: 'AzureRM'
+#    azureSubscription: 'Visual Studio Professional(a2f5932a-dc69-4389-a87a-8107f0983604)'
+#    appType: 'webAppLinux'
+#    WebAppName: '$(webSitename)'
+#    packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+  
+# - task: AzureRmWebAppDeployment@4
+#   inputs:
+#     ConnectionType: 'AzureRM'
+#     azureSubscription: 'Visual Studio Professional(a2f5932a-dc69-4389-a87a-8107f0983604)'
+#     appType: 'webAppLinux'
+#     WebAppName: '$(webSiteName)'
+#     packageForLinux: '$(Build.ArtifactStagingDirectory)/WebApp.zip'
+#     RuntimeStack: 'NODE|14-lts'
