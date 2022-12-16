@@ -33,6 +33,7 @@ steps:
     location: 'East US'
     templateLocation: 'Linked artifact'
     csmFile: './scripts/environment.bicep'
+    overrideParameters: '-sqlServerAdministratorLogin $(sqlServerAdministratorLogin) -sqlServerAdministratorLoginPassword $(sqlServerAdministratorLoginPassword)'
     deploymentMode: 'Incremental'
     deploymentOutputs: 'outputStorageVar'
 
