@@ -35,3 +35,18 @@ steps:
     csmFile: './scripts/environment.bicep'
     deploymentMode: 'Incremental'
     deploymentOutputs: 'outputStorageVar'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      $obj = ConvertFrom-Json '$(outputStorageVar)'
+      Write-Host "##vso[task.setvariable variable=appServiceAppName]$($obj.appServiceAppName.value)"
+      Write-Host "##vso[task.setvariable variable=appServiceAppHostName]$($obj.appServiceAppHostName.value)"
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: '$(ArmConnection)'
+    appType: 'webAppLinux'
+    appName: '$(appServiceAppName)'
+    package: '$(Build.ArtifactStagingDirectory)/Output/**/*.zip'
