@@ -23,9 +23,9 @@ steps:
     customCommand: 'run build'
 - task: CopyFiles@2
   inputs:
-    SourceFolder: '.src/clients/azure-masterclass/build'
+    SourceFolder: './src/clients/azure-masterclass/build'
     Contents: '**'
-    TargetFolder: '.src/CloudEssentialsMasterclass.Api/wwwroot'
+    TargetFolder: './src/CloudEssentialsMasterclass.Api/wwwroot'
 
 - task: DotNetCoreCLI@2
   inputs:
