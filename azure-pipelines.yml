@@ -40,7 +40,7 @@ steps:
     ArtifactName: 'drop'
     publishLocation: 'Container'
 
-- ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
+- ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
   - task: AzureResourceManagerTemplateDeployment@3
     inputs:
       deploymentScope: 'Resource Group'
