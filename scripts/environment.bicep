@@ -152,3 +152,4 @@ resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
 
 output appServiceAppName string = appServiceApp.name
 output appServiceAppHostName string = appServiceApp.properties.defaultHostName
+output sqlServerName string = sqlServer.properties.fullyQualifiedDomainName
