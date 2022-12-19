@@ -26,6 +26,8 @@ steps:
     SourceFolder: './src/clients/azure-masterclass/build'
     Contents: '**'
     TargetFolder: './src/CloudEssentialsMasterclass.Api/wwwroot'
+    CleanTargetFolder: true
+    OverWrite: true
 
 - task: DotNetCoreCLI@2
   inputs:
