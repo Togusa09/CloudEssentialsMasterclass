@@ -23,13 +23,13 @@ else
 }
 
 app.UseHttpsRedirection();
+
+app.UseDefaultFiles();
 app.UseStaticFiles();
-app.MapFallbackToFile("index.html");
 
 app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapRazorPages();
 
 app.Run();
