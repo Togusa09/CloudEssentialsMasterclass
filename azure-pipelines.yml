@@ -63,6 +63,7 @@ steps:
         $obj = ConvertFrom-Json '$(outputStorageVar)'
         Write-Host "##vso[task.setvariable variable=appServiceAppName]$($obj.appServiceAppName.value)"
         Write-Host "##vso[task.setvariable variable=appServiceAppHostName]$($obj.appServiceAppHostName.value)"
+        Write-Host "##vso[task.setvariable variable=sqlServerName]$($obj.sqlServerName.value)"
 
   - task: AzureWebApp@1
     inputs:
@@ -70,3 +71,8 @@ steps:
       appType: 'webAppLinux'
       appName: '$(appServiceAppName)'
       package: '$(Build.ArtifactStagingDirectory)/Output/**/*.zip'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'run'
+      projects: './src/CloudEssentialsMasterclass.DbUp'
+      arguments: '-- "Data Source=tcp:$($obj.sqlServerName.value),1433;Initial Catalog=AzureMasterclass;User Id=$(sqlServerAdministratorLogin)@$(sqlServerName);Password=$(sqlServerAdministratorLoginPassword)"'
