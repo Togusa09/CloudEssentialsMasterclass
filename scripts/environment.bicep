@@ -53,7 +53,11 @@ var appServicePlanName = 'plan-${projectName}-${environmentAbbreviation}'
 // var applicationInsightsName = 'appi-${projectName}-${environmentAbbreviation}'
 var sqlServerName = 'sql-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
 var sqlDatabaseName = '${projectName}-${environmentAbbreviation}'
+var storageAccountName = 'sa-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
+var blobStorageName = 'blob-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
+var messageQueueName = 'queue-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
 
+// Per environment variable configurations
 var environmentConfigurationMap = {
   Production: {
     environmentAbbreviation: 'prod'
@@ -63,11 +67,11 @@ var environmentConfigurationMap = {
         capacity: 1
       }
     }
-    // storageAccount: {
-    //   sku: {
-    //     name: 'Standard_LRS'
-    //   }
-    // }
+    storageAccount: {
+      sku: {
+        name: 'Standard_LRS'
+      }
+    }
     sqlDatabase: {
       sku: {
         name: 'Standard'
@@ -82,11 +86,11 @@ var environmentConfigurationMap = {
         name: 'F1'
       }
     }
-    // storageAccount: {
-    //   sku: {
-    //     name: 'Standard_GRS'
-    //   }
-    // }
+    storageAccount: {
+      sku: {
+        name: 'Standard_GRS'
+      }
+    }
     sqlDatabase: {
       sku: {
         name: 'Basic'
@@ -95,6 +99,7 @@ var environmentConfigurationMap = {
   }
 }
 
+// SQL server
 resource sqlServer 'Microsoft.Sql/servers@2021-11-01' = {
   name: sqlServerName
   location: location
@@ -105,6 +110,7 @@ resource sqlServer 'Microsoft.Sql/servers@2021-11-01' = {
   }
 }
 
+// SQL Database
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01' = {
   name: sqlDatabaseName
   parent: sqlServer
@@ -116,6 +122,7 @@ resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01' = {
   }
 }
 
+// Database firewall restrictions
 resource allowAllWindowsAzureIps 'Microsoft.Sql/servers/firewallRules@2021-11-01' = {
   parent: sqlServer
   name: 'AllowAllWindowsAzureIps'
@@ -125,6 +132,7 @@ resource allowAllWindowsAzureIps 'Microsoft.Sql/servers/firewallRules@2021-11-01
   }
 }
 
+// App service plan for app service
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
   name: appServicePlanName
   location: location
@@ -135,6 +143,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
   kind: 'linux'
 }
 
+// App service to run API and website
 resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
   name: appServiceAppName
   location: location
@@ -146,6 +155,35 @@ resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
     siteConfig: {
       //netFrameworkVersion: 'v7.0'
       linuxFxVersion: linuxFxVersion
+    }
+  }
+}
+
+// Storage account for hosting blob storage
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+  name: storageAccountName
+  location: location
+  kind: 'StorageV2'
+  sku: environmentConfigurationMap[environmentType].storageAccount.sku
+  properties: {
+    accessTier: 'Hot'
+  }
+}
+
+// Blob storage containers
+resource containers 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = [for i in range(0, 2): {
+  name: '${storageAccount.name}/default/storage${i}'
+}]
+
+// Inject configuration into app service
+resource webSiteConnectionStrings 'Microsoft.Web/sites/config@2022-03-01' = {
+  parent: appServiceApp
+  name: 'connectionstrings'
+  properties: {
+    EvTrackingDb: {
+      //value: 'Data Source=tcp:${sqlServer.properties.fullyQualifiedDomainName},1433;Initial Catalog=${databaseName};User Id=${sqlAdministratorLogin}@${sqlServer.properties.fullyQualifiedDomainName};Password=${sqlAdministratorLoginPassword};'
+      value: 'Server=tcp:${sqlServer.properties.fullyQualifiedDomainName},1433;Initial Catalog=${sqlDatabaseName};Persist Security Info=False;User ID=${sqlServerAdministratorLogin};Password=${sqlServerAdministratorLoginPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+      type: 'SQLAzure'
     }
   }
 }
