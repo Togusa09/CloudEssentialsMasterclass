@@ -53,7 +53,7 @@ var appServicePlanName = 'plan-${projectName}-${environmentAbbreviation}'
 // var applicationInsightsName = 'appi-${projectName}-${environmentAbbreviation}'
 var sqlServerName = 'sql-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
 var sqlDatabaseName = '${projectName}-${environmentAbbreviation}'
-var storageAccountName = 'sa-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
+var storageAccountName = 'sa${projectName}${resourceNameSuffix}${environmentAbbreviation}'
 var blobStorageName = 'blob-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
 var messageQueueName = 'queue-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
 
