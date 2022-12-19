@@ -10,6 +10,23 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+- task: Npm@1
+  displayName: 'Npm install'
+  inputs:
+    command: 'install'
+    workingDir: './src/clients/azure-masterclass'
+- task: Npm@1
+  displayName: 'Npm Run Build'
+  inputs:
+    command: 'custom'
+    workingDir: './src/clients/azure-masterclass'
+    customCommand: 'run build'
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '.src/clients/azure-masterclass/build'
+    Contents: '**'
+    TargetFolder: '.source/CloudEssentialsMasterclass.Api/wwwroot'
+
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
@@ -23,30 +40,31 @@ steps:
     ArtifactName: 'drop'
     publishLocation: 'Container'
 
-- task: AzureResourceManagerTemplateDeployment@3
-  inputs:
-    deploymentScope: 'Resource Group'
-    azureResourceManagerConnection: '$(ArmConnection)'
-    subscriptionId: '$(SubscriptionId)'
-    action: 'Create Or Update Resource Group'
-    resourceGroupName: '$(ResourceGroup)'
-    location: 'East US'
-    templateLocation: 'Linked artifact'
-    csmFile: './scripts/environment.bicep'
-    deploymentMode: 'Incremental'
-    deploymentOutputs: 'outputStorageVar'
+- ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
+  - task: AzureResourceManagerTemplateDeployment@3
+    inputs:
+      deploymentScope: 'Resource Group'
+      azureResourceManagerConnection: '$(ArmConnection)'
+      subscriptionId: '$(SubscriptionId)'
+      action: 'Create Or Update Resource Group'
+      resourceGroupName: '$(ResourceGroup)'
+      location: 'East US'
+      templateLocation: 'Linked artifact'
+      csmFile: './scripts/environment.bicep'
+      deploymentMode: 'Incremental'
+      deploymentOutputs: 'outputStorageVar'
 
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: |
-      $obj = ConvertFrom-Json '$(outputStorageVar)'
-      Write-Host "##vso[task.setvariable variable=appServiceAppName]$($obj.appServiceAppName.value)"
-      Write-Host "##vso[task.setvariable variable=appServiceAppHostName]$($obj.appServiceAppHostName.value)"
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        $obj = ConvertFrom-Json '$(outputStorageVar)'
+        Write-Host "##vso[task.setvariable variable=appServiceAppName]$($obj.appServiceAppName.value)"
+        Write-Host "##vso[task.setvariable variable=appServiceAppHostName]$($obj.appServiceAppHostName.value)"
 
-- task: AzureWebApp@1
-  inputs:
-    azureSubscription: '$(ArmConnection)'
-    appType: 'webAppLinux'
-    appName: '$(appServiceAppName)'
-    package: '$(Build.ArtifactStagingDirectory)/Output/**/*.zip'
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: '$(ArmConnection)'
+      appType: 'webAppLinux'
+      appName: '$(appServiceAppName)'
+      package: '$(Build.ArtifactStagingDirectory)/Output/**/*.zip'
