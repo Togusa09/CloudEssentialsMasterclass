@@ -25,14 +25,14 @@ steps:
   inputs:
     SourceFolder: '.src/clients/azure-masterclass/build'
     Contents: '**'
-    TargetFolder: '.source/CloudEssentialsMasterclass.Api/wwwroot'
+    TargetFolder: '.src/CloudEssentialsMasterclass.Api/wwwroot'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
     publishWebProjects: true
     arguments: '--configuration $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)/Output'
-    workingDirectory: './source/MasterclassApp'
+    workingDirectory: './src/CloudEssentialsMasterclass.Api'
 
 - task: PublishBuildArtifacts@1
   inputs:
