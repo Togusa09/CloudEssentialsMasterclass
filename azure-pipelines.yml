@@ -39,7 +39,6 @@ steps:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
-
 - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
   - task: AzureResourceManagerTemplateDeployment@3
     inputs:
@@ -51,6 +50,7 @@ steps:
       location: 'East US'
       templateLocation: 'Linked artifact'
       csmFile: './scripts/environment.bicep'
+      overrideParameters: '-sqlServerAdministratorLogin $(sqlServerAdministratorLogin) -sqlServerAdministratorLoginPassword $(sqlServerAdministratorLoginPassword) -environmentType Development'
       deploymentMode: 'Incremental'
       deploymentOutputs: 'outputStorageVar'
 
