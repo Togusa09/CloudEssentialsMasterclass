@@ -75,4 +75,4 @@ steps:
     inputs:
       command: 'run'
       projects: './src/CloudEssentialsMasterclass.DbUp'
-      arguments: '-- "Data Source=tcp:$($obj.sqlServerName.value),1433;Initial Catalog=AzureMasterclass;User Id=$(sqlServerAdministratorLogin)@$(sqlServerName);Password=$(sqlServerAdministratorLoginPassword)"'
+      arguments: '-- "Data Source=tcp:$(sqlServerName),1433;Initial Catalog=AzureMasterclass;User Id=$(sqlServerAdministratorLogin)@$(sqlServerName);Password=$(sqlServerAdministratorLoginPassword)"'
