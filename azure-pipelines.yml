@@ -45,11 +45,11 @@ steps:
   - task: AzureResourceManagerTemplateDeployment@3
     inputs:
       deploymentScope: 'Resource Group'
-      azureResourceManagerConnection: '$(ArmConnection)'
-      subscriptionId: '$(SubscriptionId)'
+      azureResourceManagerConnection: 'AzurePortalServiceConnection'
+      subscriptionId: 'dd20cd23-3e67-47f9-8d28-a8ba1b142cdf'
       action: 'Create Or Update Resource Group'
-      resourceGroupName: '$(ResourceGroup)'
-      location: 'East US'
+      resourceGroupName: 'MasterClassDev'
+      location: 'Australia East'
       templateLocation: 'Linked artifact'
       csmFile: './scripts/environment.bicep'
       overrideParameters: '-sqlServerAdministratorLogin $(sqlServerAdministratorLogin) -sqlServerAdministratorLoginPassword $(sqlServerAdministratorLoginPassword) -environmentType Development'
