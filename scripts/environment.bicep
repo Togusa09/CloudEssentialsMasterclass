@@ -49,13 +49,13 @@ var environmentAbbreviation = environmentConfigurationMap[environmentType].envir
 // var keyVaultName = 'kv-${projectName}-${environmentAbbreviation}'
 var appServiceAppName = 'as-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
 var appServicePlanName = 'plan-${projectName}-${environmentAbbreviation}'
-// var logAnalyticsWorkspaceName = 'log-${projectName}-${environmentAbbreviation}'
-// var applicationInsightsName = 'appi-${projectName}-${environmentAbbreviation}'
+var logAnalyticsWorkspaceName = 'log-${projectName}-${environmentAbbreviation}'
+var applicationInsightsName = 'appi-${projectName}-${environmentAbbreviation}'
 var sqlServerName = 'sql-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
 var sqlDatabaseName = '${projectName}-${environmentAbbreviation}'
 var storageAccountName = 'sa${resourceNameSuffix}${toLower(environmentAbbreviation)}'
-var blobStorageName = 'blob-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
-var messageQueueName = 'queue-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
+//var blobStorageName = 'blob-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
+//var messageQueueName = 'queue-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
 
 // Per environment variable configurations
 var environmentConfigurationMap = {
@@ -98,6 +98,29 @@ var environmentConfigurationMap = {
     }
   }
 }
+
+// Log analytics
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-10-01' = {
+  name: logAnalyticsWorkspaceName
+  location: location
+  properties: {
+    sku: {
+      name: 'PerGB2018'
+    }
+  }
+}
+
+// Application insights
+resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
+  name: applicationInsightsName
+  location: location
+  kind: 'web'
+  properties: {
+    Application_Type: 'web'
+    WorkspaceResourceId: logAnalyticsWorkspace.id
+  }
+}
+
 
 // SQL server
 resource sqlServer 'Microsoft.Sql/servers@2021-11-01' = {
@@ -156,6 +179,33 @@ resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
       //netFrameworkVersion: 'v7.0'
       linuxFxVersion: linuxFxVersion
     }
+  }
+}
+
+resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
+  name: serviceBusNamespaceName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {}
+}
+
+resource serviceBusQueue 'Microsoft.ServiceBus/namespaces/queues@2022-01-01-preview' = {
+  parent: serviceBusNamespace
+  name: serviceBusQueueName
+  properties: {
+    lockDuration: 'PT5M'
+    maxSizeInMegabytes: 1024
+    requiresDuplicateDetection: false
+    requiresSession: false
+    defaultMessageTimeToLive: 'P10675199DT2H48M5.4775807S'
+    deadLetteringOnMessageExpiration: false
+    duplicateDetectionHistoryTimeWindow: 'PT10M'
+    maxDeliveryCount: 10
+    autoDeleteOnIdle: 'P10675199DT2H48M5.4775807S'
+    enablePartitioning: false
+    enableExpress: false
   }
 }
 
