@@ -64,7 +64,7 @@ var environmentConfigurationMap = {
     environmentAbbreviation: 'prod'
     appServicePlan: {
       sku: {
-        name: 'B1'
+        name: 'S1'
         capacity: 1
       }
     }
@@ -84,7 +84,7 @@ var environmentConfigurationMap = {
     environmentAbbreviation: 'dev'
     appServicePlan: {
       sku: {
-        name: 'F1'
+        name: 'B1'
       }
     }
     storageAccount: {
