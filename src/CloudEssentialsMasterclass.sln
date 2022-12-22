@@ -5,7 +5,9 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudEssentialsMasterclass.Api", "CloudEssentialsMasterclass.Api\CloudEssentialsMasterclass.Api.csproj", "{04CDD930-87A3-43D9-8EAF-9536AD91C120}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEssentialsMasterclass.DbUp", "CloudEssentialsMasterclass.DbUp\CloudEssentialsMasterclass.DbUp.csproj", "{760539CF-8D58-4501-ADF7-3C866419CA31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudEssentialsMasterclass.DbUp", "CloudEssentialsMasterclass.DbUp\CloudEssentialsMasterclass.DbUp.csproj", "{760539CF-8D58-4501-ADF7-3C866419CA31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEssentialsMasterClass.Function", "CloudEssentialsMasterClass.Function\CloudEssentialsMasterClass.Function.csproj", "{6BBD206C-B3CC-41CE-A0D0-000B1A1496F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{760539CF-8D58-4501-ADF7-3C866419CA31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{760539CF-8D58-4501-ADF7-3C866419CA31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{760539CF-8D58-4501-ADF7-3C866419CA31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BBD206C-B3CC-41CE-A0D0-000B1A1496F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BBD206C-B3CC-41CE-A0D0-000B1A1496F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BBD206C-B3CC-41CE-A0D0-000B1A1496F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BBD206C-B3CC-41CE-A0D0-000B1A1496F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

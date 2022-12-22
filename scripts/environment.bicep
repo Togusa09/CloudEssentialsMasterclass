@@ -56,6 +56,7 @@ var sqlDatabaseName = '${projectName}-${environmentAbbreviation}'
 var storageAccountName = 'sa${resourceNameSuffix}${toLower(environmentAbbreviation)}'
 //var blobStorageName = 'blob-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
 //var messageQueueName = 'queue-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
+var functionAppName = 'f${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
 
 // Per environment variable configurations
 var environmentConfigurationMap = {
@@ -238,6 +239,54 @@ resource webSiteConnectionStrings 'Microsoft.Web/sites/config@2022-03-01' = {
   }
 }
 
+resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
+  name: functionAppName
+  location: location
+  kind: 'functionapp'
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    serverFarmId: appServicePlan.id
+    siteConfig: {
+      appSettings: [
+        {
+          name: 'AzureWebJobsStorage'
+          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+        }
+        {
+          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+        }
+        {
+          name: 'WEBSITE_CONTENTSHARE'
+          value: toLower(functionAppName)
+        }
+        {
+          name: 'FUNCTIONS_EXTENSION_VERSION'
+          value: '~2'
+        }
+        {
+          name: 'WEBSITE_NODE_DEFAULT_VERSION'
+          value: '~10'
+        }
+        {
+          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: applicationInsights.properties.InstrumentationKey
+        }
+        {
+          name: 'FUNCTIONS_WORKER_RUNTIME'
+          value: 'dotnet'
+        }
+      ]
+      ftpsState: 'FtpsOnly'
+      minTlsVersion: '1.2'
+    }
+    httpsOnly: true
+  }
+}
+
 output appServiceAppName string = appServiceApp.name
 output appServiceAppHostName string = appServiceApp.properties.defaultHostName
 output sqlServerName string = sqlServer.properties.fullyQualifiedDomainName
+output functionAppName string = functionApp.name
