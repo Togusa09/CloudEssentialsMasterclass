@@ -64,7 +64,7 @@ var environmentConfigurationMap = {
     environmentAbbreviation: 'prod'
     appServicePlan: {
       sku: {
-        name: 'S1'
+        name: 'B1'
         capacity: 1
       }
     }
