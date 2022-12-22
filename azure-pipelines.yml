@@ -37,14 +37,14 @@ steps:
     arguments: '--configuration $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)/Output'
     workingDirectory: './src/CloudEssentialsMasterclass.Api'
 
- - task: DotNetCoreCLI@2
-      displayName: 'Publish the function app - $(buildConfiguration)'
-      inputs:
-        command: 'publish'
-        projects: './src/CloudEssentialsMasterClass.Function'
-        publishWebProjects: false
-        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Output'
-        zipAfterPublish: true
+- task: DotNetCoreCLI@2
+  displayName: 'Publish the function app - $(buildConfiguration)'
+  inputs:
+    command: 'publish'
+    projects: './src/CloudEssentialsMasterClass.Function'
+    publishWebProjects: false
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Output'
+    zipAfterPublish: true
 
 - task: PublishBuildArtifacts@1
   inputs:
