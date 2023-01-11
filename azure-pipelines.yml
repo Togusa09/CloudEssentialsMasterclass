@@ -117,8 +117,8 @@ steps:
       
   - task: UseDotNet@2 
     inputs:
+      packageType: 'sdk'
       version: '5.0.x'
-      packageType: runtime
 
   - task: DotNetCoreCLI@2
     inputs:
