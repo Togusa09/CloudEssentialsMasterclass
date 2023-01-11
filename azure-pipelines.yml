@@ -69,6 +69,8 @@ steps:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
+
+
 - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
 
   - task: AzureResourceManagerTemplateDeployment@3
@@ -101,18 +103,18 @@ steps:
       appType: 'webAppLinux'
       appName: '$(appServiceAppName)'
       package: '$(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Api.zip'
-
-  # - task: AzureFunctionApp@1
-  #   displayName: 'Azure Function Deploy'
-  #   inputs:
-  #     azureSubscription: '$(ArmConnection)'
-  #     appType: functionAppLinux
-  #     appName: '$(functionAppName)'
-  #     #package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/Tailspin.SpaceGame.LeaderboardFunction.zip'
-  #     package: '$(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Function.zip'
-  #     runtimeStack: DOTNET|7.0
-  #     startUpCommand: 'func azure functionapp publish $(functionAppName) --no-bundler'
-  
+      
+  - task: AzureFunctionApp@1
+    displayName: 'Azure Function Deploy'
+    inputs:
+      azureSubscription: '$(ArmConnection)'
+      appType: functionAppLinux
+      appName: '$(functionAppName)'
+      #package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/Tailspin.SpaceGame.LeaderboardFunction.zip'
+      package: '$(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Function.zip'
+      runtimeStack: DOTNET|7.0
+      startUpCommand: 'func azure functionapp publish $(functionAppName) --no-bundler'
+      
   # TODO - do we have to do this?
   - task: UseDotNet@2 
     inputs:
