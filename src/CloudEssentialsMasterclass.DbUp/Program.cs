@@ -10,14 +10,19 @@ namespace CloudEssentialsMasterclass.DbUp // Note: actual namespace depends on t
         static int Main(string[] args)
         {
             var env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                // .AddJsonFile($"appsettings.{env}.json", true)
-                .AddEnvironmentVariables()
-                .Build();
+
+            // var configuration = new ConfigurationBuilder()
+            //     .SetBasePath(Directory.GetCurrentDirectory())
+            //     .AddJsonFile("appsettings.json")
+            //     .AddJsonFile($"appsettings.{env}.json", true)
+            //     .AddEnvironmentVariables()
+            //     .Build();
             
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            // var connectionString = configuration.GetConnectionString("DefaultConnection");
+            
+            var connectionString =
+                args.FirstOrDefault()
+                ?? "Server=.;Database=AzureMasterclass; Trusted_connection=true;MultipleActiveResultSets=true;TrustServerCertificate=True";
             
             var upgrader =
                 DeployChanges.To
