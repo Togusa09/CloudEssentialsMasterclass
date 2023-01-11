@@ -35,10 +35,13 @@ steps:
     OverWrite: true
 
 # Server
-- task: UseDotNet@2
+
+# TODO - do we have to do this?
+- task: UseDotNet@2  
   inputs:
     version: '5.0.x'
     packageType: runtime
+
 - task: DotNetCoreCLI@2
   displayName: 'Publish the web app - $(buildConfiguration)'
   inputs:
@@ -67,6 +70,7 @@ steps:
     ArtifactName: 'drop'
     publishLocation: 'Container'
 - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
+
   - task: AzureResourceManagerTemplateDeployment@3
     inputs:
       deploymentScope: 'Resource Group'
@@ -108,7 +112,13 @@ steps:
   #     package: '$(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterClass.Function.zip'
   #     runtimeStack: DOTNET|7.0
   #     startUpCommand: 'func azure functionapp publish $(functionAppName) --no-bundler'
-      
+  
+  # TODO - do we have to do this?
+  - task: UseDotNet@2 
+  inputs:
+    version: '5.0.x'
+    packageType: runtime
+
   - task: DotNetCoreCLI@2
     inputs:
       command: 'run'
