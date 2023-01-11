@@ -13,7 +13,7 @@ namespace CloudEssentialsMasterclass.DbUp // Note: actual namespace depends on t
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
-                .AddJsonFile($"appsettings.{env}.json", true)
+                // .AddJsonFile($"appsettings.{env}.json", true)
                 .AddEnvironmentVariables()
                 .Build();
             
