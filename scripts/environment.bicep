@@ -49,13 +49,14 @@ var environmentAbbreviation = environmentConfigurationMap[environmentType].envir
 // var keyVaultName = 'kv-${projectName}-${environmentAbbreviation}'
 var appServiceAppName = 'as-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
 var appServicePlanName = 'plan-${projectName}-${environmentAbbreviation}'
-// var logAnalyticsWorkspaceName = 'log-${projectName}-${environmentAbbreviation}'
-// var applicationInsightsName = 'appi-${projectName}-${environmentAbbreviation}'
+var logAnalyticsWorkspaceName = 'log-${projectName}-${environmentAbbreviation}'
+var applicationInsightsName = 'appi-${projectName}-${environmentAbbreviation}'
 var sqlServerName = 'sql-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
 var sqlDatabaseName = '${projectName}-${environmentAbbreviation}'
 var storageAccountName = 'sa${resourceNameSuffix}${toLower(environmentAbbreviation)}'
-var blobStorageName = 'blob-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
-var messageQueueName = 'queue-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
+//var blobStorageName = 'blob-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
+//var messageQueueName = 'queue-${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
+var functionAppName = 'f${projectName}-${resourceNameSuffix}-${environmentAbbreviation}'
 
 // Per environment variable configurations
 var environmentConfigurationMap = {
@@ -83,7 +84,7 @@ var environmentConfigurationMap = {
     environmentAbbreviation: 'dev'
     appServicePlan: {
       sku: {
-        name: 'F1'
+        name: 'B1'
       }
     }
     storageAccount: {
@@ -98,6 +99,29 @@ var environmentConfigurationMap = {
     }
   }
 }
+
+// Log analytics
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2020-10-01' = {
+  name: logAnalyticsWorkspaceName
+  location: location
+  properties: {
+    sku: {
+      name: 'PerGB2018'
+    }
+  }
+}
+
+// Application insights
+resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
+  name: applicationInsightsName
+  location: location
+  kind: 'web'
+  properties: {
+    Application_Type: 'web'
+    WorkspaceResourceId: logAnalyticsWorkspace.id
+  }
+}
+
 
 // SQL server
 resource sqlServer 'Microsoft.Sql/servers@2021-11-01' = {
@@ -159,6 +183,33 @@ resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
   }
 }
 
+// resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
+//   name: serviceBusNamespaceName
+//   location: location
+//   sku: {
+//     name: 'Standard'
+//   }
+//   properties: {}
+// }
+
+// resource serviceBusQueue 'Microsoft.ServiceBus/namespaces/queues@2022-01-01-preview' = {
+//   parent: serviceBusNamespace
+//   name: serviceBusQueueName
+//   properties: {
+//     lockDuration: 'PT5M'
+//     maxSizeInMegabytes: 1024
+//     requiresDuplicateDetection: false
+//     requiresSession: false
+//     defaultMessageTimeToLive: 'P10675199DT2H48M5.4775807S'
+//     deadLetteringOnMessageExpiration: false
+//     duplicateDetectionHistoryTimeWindow: 'PT10M'
+//     maxDeliveryCount: 10
+//     autoDeleteOnIdle: 'P10675199DT2H48M5.4775807S'
+//     enablePartitioning: false
+//     enableExpress: false
+//   }
+// }
+
 // Storage account for hosting blob storage
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: storageAccountName
@@ -188,6 +239,54 @@ resource webSiteConnectionStrings 'Microsoft.Web/sites/config@2022-03-01' = {
   }
 }
 
+resource functionApp 'Microsoft.Web/sites@2021-03-01' = {
+  name: functionAppName
+  location: location
+  kind: 'functionapp'
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    serverFarmId: appServicePlan.id
+    siteConfig: {
+      appSettings: [
+        {
+          name: 'AzureWebJobsStorage'
+          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+        }
+        {
+          name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+        }
+        {
+          name: 'WEBSITE_CONTENTSHARE'
+          value: toLower(functionAppName)
+        }
+        {
+          name: 'FUNCTIONS_EXTENSION_VERSION'
+          value: '~2'
+        }
+        {
+          name: 'WEBSITE_NODE_DEFAULT_VERSION'
+          value: '~10'
+        }
+        {
+          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: applicationInsights.properties.InstrumentationKey
+        }
+        {
+          name: 'FUNCTIONS_WORKER_RUNTIME'
+          value: 'dotnet'
+        }
+      ]
+      ftpsState: 'FtpsOnly'
+      minTlsVersion: '1.2'
+    }
+    httpsOnly: true
+  }
+}
+
 output appServiceAppName string = appServiceApp.name
 output appServiceAppHostName string = appServiceApp.properties.defaultHostName
 output sqlServerName string = sqlServer.properties.fullyQualifiedDomainName
+output functionAppName string = functionApp.name

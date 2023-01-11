@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddCors();
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -23,6 +24,10 @@ else
 }
 
 app.UseHttpsRedirection();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller}/{action=Index}/{id?}");
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

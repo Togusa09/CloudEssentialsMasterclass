@@ -1,6 +1,7 @@
 ﻿
 using System.Reflection;
 using DbUp;
+using Microsoft.Extensions.Configuration;
 
 namespace CloudEssentialsMasterClass.DbUp // Note: actual namespace depends on the project name.
 {
@@ -8,10 +9,16 @@ namespace CloudEssentialsMasterClass.DbUp // Note: actual namespace depends on t
     {
         static int Main(string[] args)
         {
-            var connectionString =
-                args.FirstOrDefault()
-                ?? "Server=.;Database=AzureMasterclass; Trusted_connection=true;MultipleActiveResultSets=true;TrustServerCertificate=True";
-
+            var env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile($"appsettings.{env}.json")
+                .AddEnvironmentVariables()
+                .Build();
+            
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            
             var upgrader =
                 DeployChanges.To
                     .SqlDatabase(connectionString)
