@@ -13,8 +13,6 @@ variables:
   dotnetSdkVersion: '3.1.101'
 
 steps:
-
-# Client
 - task: Npm@1
   displayName: 'Npm install'
   inputs:
@@ -33,15 +31,10 @@ steps:
     TargetFolder: './src/CloudEssentialsMasterclass.Api/wwwroot'
     CleanTargetFolder: true
     OverWrite: true
-
-# Server
-
-# TODO - do we have to do this?
 - task: UseDotNet@2  
   inputs:
     version: '5.0.x'
     packageType: runtime
-    
 - task: DotNetCoreCLI@2
   displayName: 'Publish the web app - $(buildConfiguration)'
   inputs:
@@ -49,7 +42,6 @@ steps:
     publishWebProjects: true
     arguments: '--configuration $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)/Output'
     workingDirectory: './src/CloudEssentialsMasterclass.Api'
-
 - task: DotNetCoreCLI@2
   displayName: 'Publish the function app - $(buildConfiguration)'
   inputs:
@@ -58,20 +50,16 @@ steps:
     publishWebProjects: false
     arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Output'
     zipAfterPublish: true
-
 - task: Bash@3
   inputs:
     targetType: 'inline'
     script: 'mv $(Build.ArtifactStagingDirectory)/Output/src.zip $(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Function.zip'
-
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
-
 - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
-
   - task: AzureResourceManagerTemplateDeployment@3
     inputs:
       deploymentScope: 'Resource Group'
@@ -85,7 +73,6 @@ steps:
       overrideParameters: '-sqlServerAdministratorLogin $(sqlServerAdministratorLogin) -sqlServerAdministratorLoginPassword $(sqlServerAdministratorLoginPassword) -environmentType Development'
       deploymentMode: 'Incremental'
       deploymentOutputs: 'outputStorageVar'
-
   - task: PowerShell@2
     inputs:
       targetType: 'inline'
@@ -95,14 +82,12 @@ steps:
         Write-Host "##vso[task.setvariable variable=appServiceAppHostName]$($obj.appServiceAppHostName.value)"
         Write-Host "##vso[task.setvariable variable=sqlServerName]$($obj.sqlServerName.value)"
         Write-Host "##vso[task.setvariable variable=functionAppName]$($obj.functionAppName.value)"
-
   - task: AzureWebApp@1
     inputs:
       azureSubscription: 'Azure subscription 1(dd20cd23-3e67-47f9-8d28-a8ba1b142cdf)'
       appType: 'webAppLinux'
       appName: '$(appServiceAppName)'
       package: '$(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Api.zip'
-      
   # - task: AzureFunctionApp@1
   #   displayName: 'Azure Function Deploy'
   #   inputs:
@@ -113,12 +98,10 @@ steps:
   #     package: '$(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Function.zip'
   #     runtimeStack: DOTNET|7.0
   #     startUpCommand: 'func azure functionapp publish $(functionAppName) --no-bundler'
-      
   - task: UseDotNet@2 
     inputs:
       packageType: 'sdk'
       version: '5.0.x'
-      
   - task: DotNetCoreCLI@2
     inputs:
       command: 'run'
