@@ -54,7 +54,7 @@ steps:
   displayName: 'Publish the function app - $(buildConfiguration)'
   inputs:
     command: 'publish'
-    projects: './src/CloudEssentialsMasterClass.Function'
+    projects: './src/CloudEssentialsMasterclass.Function'
     publishWebProjects: false
     arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Output'
     zipAfterPublish: true
@@ -62,7 +62,7 @@ steps:
 - task: Bash@3
   inputs:
     targetType: 'inline'
-    script: 'mv $(Build.ArtifactStagingDirectory)/Output/src.zip $(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterClass.Function.zip'
+    script: 'mv $(Build.ArtifactStagingDirectory)/Output/src.zip $(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Function.zip'
 
 - task: PublishBuildArtifacts@1
   inputs:
@@ -109,7 +109,7 @@ steps:
   #     appType: functionAppLinux
   #     appName: '$(functionAppName)'
   #     #package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/Tailspin.SpaceGame.LeaderboardFunction.zip'
-  #     package: '$(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterClass.Function.zip'
+  #     package: '$(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Function.zip'
   #     runtimeStack: DOTNET|7.0
   #     startUpCommand: 'func azure functionapp publish $(functionAppName) --no-bundler'
   

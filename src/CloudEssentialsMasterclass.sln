@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudEssentialsMasterclass.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CloudEssentialsMasterclass.DbUp", "CloudEssentialsMasterclass.DbUp\CloudEssentialsMasterclass.DbUp.csproj", "{760539CF-8D58-4501-ADF7-3C866419CA31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEssentialsMasterClass.Function", "CloudEssentialsMasterClass.Function\CloudEssentialsMasterClass.Function.csproj", "{6BBD206C-B3CC-41CE-A0D0-000B1A1496F4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudEssentialsMasterclass.Function", "CloudEssentialsMasterclass.Function\CloudEssentialsMasterclass.Function.csproj", "{6BBD206C-B3CC-41CE-A0D0-000B1A1496F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

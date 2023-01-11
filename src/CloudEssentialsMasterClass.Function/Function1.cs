@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace CloudEssentialsMasterClass.Function
+namespace CloudEssentialsMasterclass.Function
 {
     public static class Function1
     {

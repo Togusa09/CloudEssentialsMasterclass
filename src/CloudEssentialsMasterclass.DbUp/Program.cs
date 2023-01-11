@@ -3,7 +3,7 @@ using System.Reflection;
 using DbUp;
 using Microsoft.Extensions.Configuration;
 
-namespace CloudEssentialsMasterClass.DbUp // Note: actual namespace depends on the project name.
+namespace CloudEssentialsMasterclass.DbUp // Note: actual namespace depends on the project name.
 {
     internal class Program
     {
