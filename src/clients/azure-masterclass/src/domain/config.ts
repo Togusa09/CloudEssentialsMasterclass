@@ -2,8 +2,6 @@ interface AppConfig {
     apiUrl: string
 }
 
-console.log('process.env.NODE_ENV', process.env.NODE_ENV)
-
 // See: process.env.NODE_ENV in https://create-react-app.dev/docs/adding-custom-environment-variables/
 const isDev = process.env.NODE_ENV === 'development'
 

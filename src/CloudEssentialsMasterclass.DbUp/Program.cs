@@ -37,7 +37,9 @@ namespace CloudEssentialsMasterclass.DbUp // Note: actual namespace depends on t
         }
 
         private static string GetConnectionString(string[] args) {
-            var isDev = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") == "Development";
+            var env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+            var isDev = env == "Development";
+            
             if (isDev) {
                 // TODO: I'm not sure why, but appsettings.json is not being found 
                 // when the "Run database migrations" task in azure-pipeline.yml by the pipeline.

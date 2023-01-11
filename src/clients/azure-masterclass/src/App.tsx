@@ -7,13 +7,10 @@ function App() {
     const [weather, setWeather] = useState<WeatherForecast>()
 
     useEffect(() => {
-        console.log('useEffect')
         WeatherService.getWeather().then(weather => {
             setWeather(weather)
         })
     }, [])
-
-    console.log('weather', weather)
 
     return (
         <div className='App'>
