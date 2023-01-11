@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <None Update="appsettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="appsettings.Development.json">
        <!-- Should not have to do this? -->
