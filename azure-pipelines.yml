@@ -9,7 +9,12 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  dotnetSdkVersion: '3.1.101'
+
 steps:
+
+# Client
 - task: Npm@1
   displayName: 'Npm install'
   inputs:
@@ -29,6 +34,11 @@ steps:
     CleanTargetFolder: true
     OverWrite: true
 
+# Server
+- task: UseDotNet@2
+  inputs:
+    version: '5.0.x'
+    packageType: runtime
 - task: DotNetCoreCLI@2
   displayName: 'Publish the web app - $(buildConfiguration)'
   inputs:
