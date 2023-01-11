@@ -1,4 +1,4 @@
-import { http } from "./http";
+import { http } from './http'
 
 export type WeatherForecast = {
     dateTime: Date
@@ -8,5 +8,5 @@ export type WeatherForecast = {
 }
 
 export const WeatherService = {
-    getWeather: () => http.get<WeatherForecast>('/weatherforecast')
+    getWeather: () => http.get<WeatherForecast>('/weatherforecast'),
 }
