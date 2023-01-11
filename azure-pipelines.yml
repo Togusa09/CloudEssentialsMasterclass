@@ -10,7 +10,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  dotnetSdkVersion: '3.1.101'
+  dotnetSdkVersion: '7.0.x'
 
 steps:
 - task: Npm@1
@@ -33,7 +33,7 @@ steps:
     OverWrite: true
 - task: UseDotNet@2  
   inputs:
-    version: '7.0.x'
+    version: '$(dotnetSdkVersion)'
     packageType: runtime
 - task: DotNetCoreCLI@2
   displayName: 'Publish the web app - $(buildConfiguration)'
@@ -101,8 +101,9 @@ steps:
   - task: UseDotNet@2 
     inputs:
       packageType: 'sdk'
-      version: '7.0.x'
+      version: '$(dotnetSdkVersion)'
   - task: DotNetCoreCLI@2
+    displayName: 'Run database migrations'
     inputs:
       command: 'run'
       projects: './src/CloudEssentialsMasterclass.DbUp'

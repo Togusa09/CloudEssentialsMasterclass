@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { config } from './config';
+import axios from 'axios'
+import { config } from './config'
 
 const httpClient = axios.create({
     baseURL: config.apiUrl,
@@ -7,5 +7,5 @@ const httpClient = axios.create({
 })
 
 export const http = {
-    get: async <T>(url: string): Promise<T> => httpClient.get<T>(url).then(res => res.data)
+    get: async <T>(url: string): Promise<T> => httpClient.get<T>(url).then(res => res.data),
 }
