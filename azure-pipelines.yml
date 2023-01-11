@@ -119,7 +119,7 @@ steps:
     inputs:
       version: '5.0.x'
       packageType: runtime
-
+      
   - task: DotNetCoreCLI@2
     inputs:
       command: 'run'
