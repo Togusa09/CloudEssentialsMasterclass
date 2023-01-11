@@ -50,10 +50,10 @@ steps:
 #     publishWebProjects: false
 #     arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Output'
 #     zipAfterPublish: true
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: 'mv $(Build.ArtifactStagingDirectory)/Output/src.zip $(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Function.zip'
+# - task: Bash@3
+#   inputs:
+#     targetType: 'inline'
+#     script: 'mv $(Build.ArtifactStagingDirectory)/Output/src.zip $(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Function.zip'
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
