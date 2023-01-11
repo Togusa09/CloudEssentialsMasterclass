@@ -115,9 +115,9 @@ steps:
   
   # TODO - do we have to do this?
   - task: UseDotNet@2 
-  inputs:
-    version: '5.0.x'
-    packageType: runtime
+    inputs:
+      version: '5.0.x'
+      packageType: runtime
 
   - task: DotNetCoreCLI@2
     inputs:
