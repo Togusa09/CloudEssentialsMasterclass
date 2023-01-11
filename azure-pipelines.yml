@@ -41,7 +41,7 @@ steps:
   inputs:
     version: '5.0.x'
     packageType: runtime
-
+    
 - task: DotNetCoreCLI@2
   displayName: 'Publish the web app - $(buildConfiguration)'
   inputs:
@@ -69,7 +69,6 @@ steps:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
-
 
 - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
 
