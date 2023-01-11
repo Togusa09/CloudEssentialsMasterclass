@@ -38,7 +38,8 @@ namespace CloudEssentialsMasterclass.DbUp // Note: actual namespace depends on t
 
         private static string GetConnectionString(string[] args) {
             var env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
-            var isDev = env == "Development";
+            // var isDev = env == "Development";
+            var isDev = false;
             
             if (isDev) {
                 // TODO: I'm not sure why, but appsettings.json is not being found 
