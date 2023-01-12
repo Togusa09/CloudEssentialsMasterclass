@@ -3,11 +3,14 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-# Key Concepts
+# Key
 # https://learn.microsoft.com/en-us/azure/devops/pipelines/get-started/key-pipelines-concepts?view=azure-devops
 
 trigger:
-  - master
+- master
+
+pool:
+  vmImage: ubuntu-latest
 
 variables:
   dotnetSdkVersion: '7.0.x'
