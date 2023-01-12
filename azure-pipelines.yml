@@ -85,7 +85,7 @@ jobs:
       displayName: 'Download Build Artifacts'
       inputs:
         artifactName: 'drop'
-        downloadPath: $(Build.ArtifactStagingDirectory)
+        downloadPath: $(Build.ArtifactStagingDirectory)/Output
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         deploymentScope: 'Resource Group'
