@@ -78,6 +78,11 @@ jobs:
       vmImage: 'ubuntu-latest'
     condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     steps:
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts'
+      inputs:
+        artifactName: 'drop'
+        downloadPath: $(Build.ArtifactStagingDirectory)
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         deploymentScope: 'Resource Group'
