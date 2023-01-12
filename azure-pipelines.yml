@@ -3,131 +3,126 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-# Key Concepts
+# Key
 # https://learn.microsoft.com/en-us/azure/devops/pipelines/get-started/key-pipelines-concepts?view=azure-devops
 
 trigger:
-  - master
+- master
+
+pool:
+  vmImage: ubuntu-latest
 
 variables:
   dotnetSdkVersion: '7.0.x'
 
-jobs:
-  - job: BuildAndPublish
-    displayName: 'Build and Publish'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
+steps:
 
-    - task: Npm@1
-      displayName: 'Npm install'
-      inputs:
-        command: 'install'
-        workingDir: './src/clients/azure-masterclass'
+- task: Npm@1
+  displayName: 'Npm install'
+  inputs:
+    command: 'install'
+    workingDir: './src/clients/azure-masterclass'
 
-    - task: Npm@1
-      displayName: 'Npm Run Build'
-      inputs:
-        command: 'custom'
-        workingDir: './src/clients/azure-masterclass'
-        customCommand: 'run build'
+- task: Npm@1
+  displayName: 'Npm Run Build'
+  inputs:
+    command: 'custom'
+    workingDir: './src/clients/azure-masterclass'
+    customCommand: 'run build'
 
-    - task: CopyFiles@2
-      inputs:
-        SourceFolder: './src/clients/azure-masterclass/build'
-        Contents: '**'
-        TargetFolder: './src/CloudEssentialsMasterclass.Api/wwwroot'
-        CleanTargetFolder: true
-        OverWrite: true
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: './src/clients/azure-masterclass/build'
+    Contents: '**'
+    TargetFolder: './src/CloudEssentialsMasterclass.Api/wwwroot'
+    CleanTargetFolder: true
+    OverWrite: true
 
-    - task: UseDotNet@2  
-      inputs:
-        version: '$(dotnetSdkVersion)'
-        packageType: runtime
+- task: UseDotNet@2  
+  inputs:
+    version: '$(dotnetSdkVersion)'
+    packageType: runtime
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Publish the web app - $(buildConfiguration)'
-      inputs:
-        command: 'publish'
-        publishWebProjects: true
-        arguments: '--configuration $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)/Output'
-        workingDirectory: './src/CloudEssentialsMasterclass.Api'
+- task: DotNetCoreCLI@2
+  displayName: 'Publish the web app - $(buildConfiguration)'
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    arguments: '--configuration $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)/Output'
+    workingDirectory: './src/CloudEssentialsMasterclass.Api'
 
-    # - task: DotNetCoreCLI@2
-    #   displayName: 'Publish the function app - $(buildConfiguration)'
-    #   inputs:
-    #     command: 'publish'
-    #     projects: './src/CloudEssentialsMasterclass.Function'
-    #     publishWebProjects: false
-    #     arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Output'
-    #     zipAfterPublish: true
-    # - task: Bash@3
-    #   inputs:
-    #     targetType: 'inline'
-    #     script: 'mv $(Build.ArtifactStagingDirectory)/Output/src.zip $(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Function.zip'
+# - task: DotNetCoreCLI@2
+#   displayName: 'Publish the function app - $(buildConfiguration)'
+#   inputs:
+#     command: 'publish'
+#     projects: './src/CloudEssentialsMasterclass.Function'
+#     publishWebProjects: false
+#     arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/Output'
+#     zipAfterPublish: true
+# - task: Bash@3
+#   inputs:
+#     targetType: 'inline'
+#     script: 'mv $(Build.ArtifactStagingDirectory)/Output/src.zip $(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Function.zip'
 
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
-        
-  - job: Deploy
-    displayName: 'Deploy'
-    pool:
-      vmImage: 'ubuntu-latest'
-    condition: and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    steps:
-    - task: AzureResourceManagerTemplateDeployment@3
-      inputs:
-        deploymentScope: 'Resource Group'
-        azureResourceManagerConnection: 'AzurePortalServiceConnection'
-        subscriptionId: 'dd20cd23-3e67-47f9-8d28-a8ba1b142cdf'
-        action: 'Create Or Update Resource Group'
-        resourceGroupName: 'MasterClassDev'
-        location: 'Australia East'
-        templateLocation: 'Linked artifact'
-        csmFile: './scripts/environment.bicep'
-        overrideParameters: '-sqlServerAdministratorLogin $(sqlServerAdministratorLogin) -sqlServerAdministratorLoginPassword $(sqlServerAdministratorLoginPassword) -environmentType Development'
-        deploymentMode: 'Incremental'
-        deploymentOutputs: 'outputStorageVar'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
 
-    - task: PowerShell@2
-      inputs:
-        targetType: 'inline'
-        script: |
-          $obj = ConvertFrom-Json '$(outputStorageVar)'
-          Write-Host "##vso[task.setvariable variable=appServiceAppName]$($obj.appServiceAppName.value)"
-          Write-Host "##vso[task.setvariable variable=appServiceAppHostName]$($obj.appServiceAppHostName.value)"
-          Write-Host "##vso[task.setvariable variable=sqlServerName]$($obj.sqlServerName.value)"
-          Write-Host "##vso[task.setvariable variable=functionAppName]$($obj.functionAppName.value)"
+# TODO - revisit this approach
+- ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
 
-    - task: AzureWebApp@1
-      inputs:
-        azureSubscription: 'Azure subscription 1(dd20cd23-3e67-47f9-8d28-a8ba1b142cdf)'
-        appType: 'webAppLinux'
-        appName: '$(appServiceAppName)'
-        package: '$(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Api.zip'
+  - task: AzureResourceManagerTemplateDeployment@3
+    inputs:
+      deploymentScope: 'Resource Group'
+      azureResourceManagerConnection: 'AzurePortalServiceConnection'
+      subscriptionId: 'dd20cd23-3e67-47f9-8d28-a8ba1b142cdf'
+      action: 'Create Or Update Resource Group'
+      resourceGroupName: 'MasterClassDev'
+      location: 'Australia East'
+      templateLocation: 'Linked artifact'
+      csmFile: './scripts/environment.bicep'
+      overrideParameters: '-sqlServerAdministratorLogin $(sqlServerAdministratorLogin) -sqlServerAdministratorLoginPassword $(sqlServerAdministratorLoginPassword) -environmentType Development'
+      deploymentMode: 'Incremental'
+      deploymentOutputs: 'outputStorageVar'
 
-    # - task: AzureFunctionApp@1
-    #   displayName: 'Azure Function Deploy'
-    #   inputs:
-    #     azureSubscription: 'Azure subscription 1(dd20cd23-3e67-47f9-8d28-a8ba1b142cdf)'
-    #     appType: functionAppLinux
-    #     appName: '$(functionAppName)'
-    #     # package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/Tailspin.SpaceGame.LeaderboardFunction.zip'
-    #     package: '$(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Function.zip'
-    #     runtimeStack: DOTNET|7.0
-    #     startUpCommand: 'func azure functionapp publish $(functionAppName) --no-bundler'
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        $obj = ConvertFrom-Json '$(outputStorageVar)'
+        Write-Host "##vso[task.setvariable variable=appServiceAppName]$($obj.appServiceAppName.value)"
+        Write-Host "##vso[task.setvariable variable=appServiceAppHostName]$($obj.appServiceAppHostName.value)"
+        Write-Host "##vso[task.setvariable variable=sqlServerName]$($obj.sqlServerName.value)"
+        Write-Host "##vso[task.setvariable variable=functionAppName]$($obj.functionAppName.value)"
 
-    - task: UseDotNet@2 
-      inputs:
-        packageType: 'sdk'
-        version: '$(dotnetSdkVersion)'
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: 'Azure subscription 1(dd20cd23-3e67-47f9-8d28-a8ba1b142cdf)'
+      appType: 'webAppLinux'
+      appName: '$(appServiceAppName)'
+      package: '$(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Api.zip'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Run database migrations'
-      inputs:
-        command: 'run'
-        projects: './src/CloudEssentialsMasterclass.DbUp'
-        arguments: '-- "Server=tcp:$(sqlServerName),1433;Initial Catalog=AzureMasterclass-dev;Persist Security Info=False;User ID=$(sqlServerAdministratorLogin);Password=$(sqlServerAdministratorLoginPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"'
+  # - task: AzureFunctionApp@1
+  #   displayName: 'Azure Function Deploy'
+  #   inputs:
+  #     azureSubscription: 'Azure subscription 1(dd20cd23-3e67-47f9-8d28-a8ba1b142cdf)'
+  #     appType: functionAppLinux
+  #     appName: '$(functionAppName)'
+  #     # package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/Tailspin.SpaceGame.LeaderboardFunction.zip'
+  #     package: '$(Build.ArtifactStagingDirectory)/Output/CloudEssentialsMasterclass.Function.zip'
+  #     runtimeStack: DOTNET|7.0
+  #     startUpCommand: 'func azure functionapp publish $(functionAppName) --no-bundler'
+
+  - task: UseDotNet@2 
+    inputs:
+      packageType: 'sdk'
+      version: '$(dotnetSdkVersion)'
+      
+  - task: DotNetCoreCLI@2
+    displayName: 'Run database migrations'
+    inputs:
+      command: 'run'
+      projects: './src/CloudEssentialsMasterclass.DbUp'
+      arguments: '-- "Server=tcp:$(sqlServerName),1433;Initial Catalog=AzureMasterclass-dev;Persist Security Info=False;User ID=$(sqlServerAdministratorLogin);Password=$(sqlServerAdministratorLoginPassword);MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"'
