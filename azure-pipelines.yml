@@ -68,7 +68,7 @@ steps:
     publishLocation: 'Container'
 
 # TODO - revisit this approach
-${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
+- ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master')) }}:
 
   - task: AzureResourceManagerTemplateDeployment@3
     inputs:
