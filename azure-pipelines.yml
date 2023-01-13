@@ -89,8 +89,8 @@ jobs:
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         deploymentScope: 'Resource Group'
-        azureResourceManagerConnection: 'AzurePortalServiceConnection'
-        subscriptionId: 'dd20cd23-3e67-47f9-8d28-a8ba1b142cdf'
+        azureResourceManagerConnection: $(ArmConnection)
+        subscriptionId: $(SubscriptionId)
         action: 'Create Or Update Resource Group'
         resourceGroupName: 'MasterClassDev'
         location: 'Australia East'
