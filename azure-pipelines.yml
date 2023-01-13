@@ -89,7 +89,7 @@ jobs:
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         deploymentScope: 'Resource Group'
-        azureResourceManagerConnection: '$(ArmConnection)''
+        azureResourceManagerConnection: '$(ArmConnection)'
         subscriptionId: '$(SubscriptionId)'
         action: 'Create Or Update Resource Group'
         resourceGroupName: 'MasterClassDev'
