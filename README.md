@@ -7,7 +7,7 @@ Scheduled for 24th March, 2023.
 
 ## Links
 
-* [SCRUM Board](https://dev.azure.com/triyuga/AzureEssentialsDemo/_boards/board/t/AzureEssentialsDemo%20Team/Backlog%20items)
+* [Backlog & Board](https://dev.azure.com/triyuga/AzureEssentialsDemo/_boards/board/t/AzureEssentialsDemo%20Team/Backlog%20items)
 
 * [Repo (Tim's DevOps)](https://dev.azure.com/triyuga/_git/AzureEssentialsDemo)
  
