@@ -89,8 +89,8 @@ jobs:
     - task: AzureResourceManagerTemplateDeployment@3
       inputs:
         deploymentScope: 'Resource Group'
-        azureResourceManagerConnection: 'AzurePortalServiceConnection'
-        subscriptionId: 'dd20cd23-3e67-47f9-8d28-a8ba1b142cdf'
+        azureResourceManagerConnection: '$(ArmConnection)'
+        subscriptionId: '$(SubscriptionId)'
         action: 'Create Or Update Resource Group'
         resourceGroupName: 'MasterClassDev'
         location: 'Australia East'
@@ -112,7 +112,7 @@ jobs:
 
     - task: AzureWebApp@1
       inputs:
-        azureSubscription: 'Azure subscription 1(dd20cd23-3e67-47f9-8d28-a8ba1b142cdf)'
+        azureSubscription: '$(ArmConnection)'
         appType: 'webAppLinux'
         appName: '$(appServiceAppName)'
         package: '$(Build.ArtifactStagingDirectory)/drop/Output/CloudEssentialsMasterclass.Api.zip'
@@ -120,7 +120,7 @@ jobs:
     # - task: AzureFunctionApp@1
     #   displayName: 'Azure Function Deploy'
     #   inputs:
-    #     azureSubscription: 'Azure subscription 1(dd20cd23-3e67-47f9-8d28-a8ba1b142cdf)'
+    #     azureSubscription: '$(ArmConnection)'
     #     appType: functionAppLinux
     #     appName: '$(functionAppName)'
     #     # package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/Tailspin.SpaceGame.LeaderboardFunction.zip'
