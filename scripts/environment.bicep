@@ -179,6 +179,12 @@ resource appServiceApp 'Microsoft.Web/sites@2022-03-01' = {
     siteConfig: {
       //netFrameworkVersion: 'v7.0'
       linuxFxVersion: linuxFxVersion
+      appSettings: [
+        {
+          name: 'AzureWebJobsStorage'
+          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+        }
+      ]
     }
   }
 }
